@@ -5,6 +5,20 @@
 @section('subheading', __('Name, cover image, and description'))
 
 @section('content')
+    <form method="GET" action="{{ route('dashboard.categories.index') }}" class="mb-6 flex flex-col sm:flex-row gap-3 sm:items-end">
+        <div class="flex-1 max-w-md">
+            <label for="q" class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">{{ __('Search by name') }}</label>
+            <input type="search" name="q" id="q" value="{{ request('q') }}" placeholder="{{ __('Category name…') }}"
+                class="block w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm shadow-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition">
+        </div>
+        <div class="flex gap-2">
+            <button type="submit" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition">{{ __('Filter') }}</button>
+            @if (request()->filled('q'))
+                <a href="{{ route('dashboard.categories.index') }}" class="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">{{ __('Clear') }}</a>
+            @endif
+        </div>
+    </form>
+
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <p class="text-sm text-slate-600">{{ __('Organize products into clear groups.') }}</p>
         <a href="{{ route('dashboard.categories.create') }}"
@@ -43,6 +57,7 @@
                                 <span class="line-clamp-2">{{ $category->description ?: '—' }}</span>
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <a href="{{ route('dashboard.products.index', ['category_id' => $category->id]) }}" class="text-sm font-semibold text-slate-700 hover:text-slate-900 mr-4">{{ __('Products') }}</a>
                                 <a href="{{ route('dashboard.categories.edit', $category) }}" class="text-sm font-semibold text-violet-600 hover:text-violet-500 mr-4">{{ __('Edit') }}</a>
                                 <form action="{{ route('dashboard.categories.destroy', $category) }}" method="POST" class="inline" onsubmit="return confirm(@json(__('Delete this category?')));">
                                     @csrf

@@ -5,8 +5,39 @@
 @section('subheading', __('Linked to categories with gallery and phone'))
 
 @section('content')
+    <form method="GET" action="{{ route('dashboard.products.index') }}" class="mb-6 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-sm">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-3">{{ __('Filters') }}</p>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
+            <div>
+                <label for="filter_category_id" class="block text-xs font-medium text-slate-600 mb-1.5">{{ __('Category') }}</label>
+                <select name="category_id" id="filter_category_id"
+                    class="block w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition bg-white">
+                    <option value="">{{ __('All categories') }}</option>
+                    @foreach ($filterCategories as $cat)
+                        <option value="{{ $cat->id }}" @selected((string) request('category_id') === (string) $cat->id)>{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="filter_status" class="block text-xs font-medium text-slate-600 mb-1.5">{{ __('Status') }}</label>
+                <select name="status" id="filter_status"
+                    class="block w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm shadow-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none transition bg-white">
+                    <option value="">{{ __('All statuses') }}</option>
+                    <option value="{{ \App\Models\Product::STATUS_ACTIVE }}" @selected(request('status') === \App\Models\Product::STATUS_ACTIVE)>{{ __('Active') }}</option>
+                    <option value="{{ \App\Models\Product::STATUS_PENDING }}" @selected(request('status') === \App\Models\Product::STATUS_PENDING)>{{ __('Pending') }}</option>
+                </select>
+            </div>
+            <div class="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-2">
+                <button type="submit" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition">{{ __('Apply filters') }}</button>
+                @if (request()->hasAny(['category_id', 'status']))
+                    <a href="{{ route('dashboard.products.index') }}" class="inline-flex items-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition">{{ __('Clear') }}</a>
+                @endif
+            </div>
+        </div>
+    </form>
+
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <p class="text-sm text-slate-600">{{ __('Each product belongs to one category.') }}</p>
+        <p class="text-sm text-slate-600">{{ __('Each product belongs to one category. Upload multiple photos per product.') }}</p>
         <a href="{{ route('dashboard.products.create') }}"
             class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-600/20 hover:from-violet-500 hover:to-indigo-500 transition">
             <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -23,6 +54,8 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">{{ __('Product') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 hidden lg:table-cell">{{ __('Category') }}</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 hidden md:table-cell">{{ __('Phone') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 hidden sm:table-cell">{{ __('Price') }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">{{ __('Status') }}</th>
                         <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
@@ -46,8 +79,17 @@
                                 <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">{{ $product->category->name }}</span>
                             </td>
                             <td class="px-6 py-4 hidden md:table-cell text-sm text-slate-700 font-mono">{{ $product->phone_number }}</td>
+                            <td class="px-6 py-4 hidden sm:table-cell text-sm font-semibold tabular-nums text-slate-900">{{ number_format((float) $product->price, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if ($product->isActive())
+                                    <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">{{ __('Active') }}</span>
+                                @else
+                                    <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900">{{ __('Pending') }}</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <a href="{{ route('dashboard.products.edit', $product) }}" class="text-sm font-semibold text-violet-600 hover:text-violet-500 mr-4">{{ __('Edit') }}</a>
+                                <a href="{{ route('dashboard.products.show', array_merge(['product' => $product], collect(request()->only(['category_id', 'status']))->filter()->all())) }}" class="text-sm font-semibold text-slate-700 hover:text-slate-900 mr-3">{{ __('Details') }}</a>
+                                <a href="{{ route('dashboard.products.edit', $product) }}" class="text-sm font-semibold text-violet-600 hover:text-violet-500 mr-3">{{ __('Edit') }}</a>
                                 <form action="{{ route('dashboard.products.destroy', $product) }}" method="POST" class="inline" onsubmit="return confirm(@json(__('Delete this product and all images?')));">
                                     @csrf
                                     @method('DELETE')
@@ -57,10 +99,15 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-16 text-center text-slate-500">
-                                <p class="font-medium text-slate-700">{{ __('No products yet') }}</p>
-                                <p class="text-sm mt-1">{{ __('Add at least one category, then create a product with images.') }}</p>
-                                <a href="{{ route('dashboard.products.create') }}" class="mt-4 inline-flex text-sm font-semibold text-violet-600">{{ __('Add product') }} →</a>
+                            <td colspan="7" class="px-6 py-16 text-center text-slate-500">
+                                <p class="font-medium text-slate-700">{{ __('No products match your filters.') }}</p>
+                                <p class="text-sm mt-1">{{ __('Try clearing filters or add a new product.') }}</p>
+                                <div class="mt-4 flex flex-wrap justify-center gap-3">
+                                    @if (request()->hasAny(['category_id', 'status']))
+                                        <a href="{{ route('dashboard.products.index') }}" class="text-sm font-semibold text-violet-600">{{ __('Clear filters') }}</a>
+                                    @endif
+                                    <a href="{{ route('dashboard.products.create') }}" class="text-sm font-semibold text-violet-600">{{ __('Add product') }} →</a>
+                                </div>
                             </td>
                         </tr>
                     @endforelse

@@ -123,4 +123,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Storefront currency label (display only)
+    |--------------------------------------------------------------------------
+    */
+
+    'currency' => env('APP_CURRENCY', 'USD'),
+
 ];

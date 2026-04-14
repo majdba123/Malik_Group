@@ -8,18 +8,38 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $products = Product::query()
             ->with(['category', 'images'])
+            ->when($request->filled('category_id'), fn ($q) => $q->where('category_id', $request->integer('category_id')))
+            ->when($request->filled('status'), function ($q) use ($request): void {
+                $s = $request->string('status')->toString();
+                if (in_array($s, [Product::STATUS_ACTIVE, Product::STATUS_PENDING], true)) {
+                    $q->where('status', $s);
+                }
+            })
             ->latest()
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString();
 
-        return view('admin.products.index', compact('products'));
+        $filterCategories = Category::query()->orderBy('name')->get();
+
+        return view('admin.products.index', compact('products', 'filterCategories'));
+    }
+
+    public function show(Product $product): View
+    {
+        $product->load(['category', 'images']);
+
+        return view('admin.products.show', compact('product'));
     }
 
     public function create(): View
@@ -36,18 +56,29 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'phone_number' => ['required', 'string', 'max:32'],
-            'images' => ['required', 'array', 'min:1'],
+            'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+            'status' => ['required', Rule::in([Product::STATUS_ACTIVE, Product::STATUS_PENDING])],
+            'images' => ['required'],
             'images.*' => ['image', 'max:4096'],
         ]);
+
+        $imageFiles = $this->validUploadedImages($request);
+        if (count($imageFiles) < 1) {
+            return back()
+                ->withInput()
+                ->withErrors(['images' => __('Upload at least one valid image. If you selected several, try again or reduce file size (max 4 MB each).')]);
+        }
 
         $product = Product::query()->create([
             'category_id' => $data['category_id'],
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
             'phone_number' => $data['phone_number'],
+            'price' => $data['price'],
+            'status' => $data['status'],
         ]);
 
-        foreach ($request->file('images') as $index => $file) {
+        foreach ($imageFiles as $index => $file) {
             $path = $file->store('products', 'public');
             $product->images()->create([
                 'path' => $path,
@@ -73,6 +104,8 @@ class ProductController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'phone_number' => ['required', 'string', 'max:32'],
+            'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
+            'status' => ['required', Rule::in([Product::STATUS_ACTIVE, Product::STATUS_PENDING])],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:4096'],
             'remove_image_ids' => ['nullable', 'array'],
@@ -84,6 +117,8 @@ class ProductController extends Controller
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
             'phone_number' => $data['phone_number'],
+            'price' => $data['price'],
+            'status' => $data['status'],
         ]);
 
         $removeIds = array_values(array_filter($data['remove_image_ids'] ?? []));
@@ -95,9 +130,10 @@ class ProductController extends Controller
                 ->each(fn (ProductImage $img) => $img->delete());
         }
 
-        if ($request->hasFile('images')) {
+        $newImages = $this->validUploadedImages($request);
+        if ($newImages !== []) {
             $maxSort = (int) $product->images()->max('sort_order');
-            foreach ($request->file('images') as $index => $file) {
+            foreach ($newImages as $index => $file) {
                 $path = $file->store('products', 'public');
                 $product->images()->create([
                     'path' => $path,
@@ -121,5 +157,19 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('dashboard.products.index')->with('success', __('Product deleted.'));
+    }
+
+    /**
+     * @return list<UploadedFile>
+     */
+    private function validUploadedImages(Request $request): array
+    {
+        $raw = $request->file('images');
+        $files = Arr::wrap($raw);
+
+        return array_values(array_filter(
+            $files,
+            fn ($f) => $f instanceof UploadedFile && $f->isValid()
+        ));
     }
 }

@@ -9,3 +9,16 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+@layer base {
+    body.lightbox-open {
+        overflow: hidden;
+    }
+}
+
+/* Lock scroll when image lightbox is open */
+@layer base {
+    body.media-lightbox-open {
+        overflow: hidden;
+    }
+}
