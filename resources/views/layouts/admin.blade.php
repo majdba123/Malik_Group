@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', __('Admin')) — {{ config('app.name') }}</title>
+    <link rel="icon" href="{{ asset('images/malik-favicon.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -13,12 +14,11 @@
 <body class="h-full font-sans antialiased bg-slate-100 text-slate-900" style="font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;">
     <div class="min-h-full lg:flex">
         <aside class="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-slate-950 text-slate-300 border-r border-slate-800/80">
-            <div class="flex h-16 shrink-0 items-center gap-2 px-6 border-b border-slate-800/80">
-                <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-sm font-bold shadow-lg shadow-violet-500/25">MG</span>
-                <div>
-                    <p class="text-sm font-semibold text-white tracking-tight">{{ config('app.name') }}</p>
-                    <p class="text-xs text-slate-500">{{ __('Admin console') }}</p>
-                </div>
+            <div class="flex h-16 shrink-0 items-center gap-2 border-b border-slate-800/80 px-4">
+                <a href="{{ route('dashboard') }}" class="rounded-lg bg-white px-2.5 py-1.5 shadow-sm ring-1 ring-white/10 transition hover:bg-white/95" aria-label="{{ config('app.name') }} — {{ __('Dashboard') }}">
+                    <x-brand-logo variant="dark" class="h-7 w-auto max-w-[9.5rem]" />
+                </a>
+                <p class="text-xs leading-tight text-slate-500">{{ __('Admin console') }}</p>
             </div>
             <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition {{ request()->routeIs('dashboard') ? 'bg-white/10 text-white border border-white/10' : 'hover:bg-white/5 hover:text-white' }}">

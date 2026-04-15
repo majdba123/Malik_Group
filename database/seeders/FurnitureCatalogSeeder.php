@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -12,6 +13,15 @@ use Illuminate\Support\Str;
 class FurnitureCatalogSeeder extends Seeder
 {
     private const DEMO_PHONE = '+1 (555) 100-2000';
+
+    /** Written from embedded base64 in EmbeddedShowcaseJpegData (same image as data:image/jpeg;base64,...). */
+    private const SHOWCASE_EMBEDDED_JPEG = 'showcase/seeder-embedded-lifestyle.jpg';
+
+    /** Optional files: copy from database/seeders/assets/showcase/ → storage/app/public/showcase/ */
+    private const SHOWCASE_FILES = [
+        'living-armchair-scene.png',
+        'living-sofa-scene.png',
+    ];
 
     public function run(): void
     {
@@ -155,6 +165,70 @@ class FurnitureCatalogSeeder extends Seeder
                         $product->images()->create(['path' => $rel, 'sort_order' => 0]);
                     }
                 }
+            }
+        }
+
+        $this->publishShowcaseAssetsToPublicDisk();
+        $this->attachShowcaseImagesToLivingRoomProducts();
+    }
+
+    private function publishShowcaseAssetsToPublicDisk(): void
+    {
+        $disk = Storage::disk('public');
+        $disk->makeDirectory('showcase');
+        $raw = base64_decode(trim(EmbeddedShowcaseJpegData::BASE64), true);
+        if ($raw !== false && $raw !== '' && str_starts_with($raw, "\xFF\xD8")) {
+            $disk->put(self::SHOWCASE_EMBEDDED_JPEG, $raw);
+        } else {
+            $this->command?->warn('Embedded showcase JPEG (base64 in EmbeddedShowcaseJpegData) failed to decode; skipping file write.');
+        }
+        foreach (self::SHOWCASE_FILES as $file) {
+            $src = database_path('seeders/assets/showcase/'.$file);
+            if (! File::exists($src)) {
+                $this->command?->warn("Optional showcase image missing in repo: {$file} (place under database/seeders/assets/showcase/).");
+
+                continue;
+            }
+            File::copy($src, $disk->path('showcase/'.$file));
+        }
+    }
+
+    private function attachShowcaseImagesToLivingRoomProducts(): void
+    {
+        $paths = [];
+        if (Storage::disk('public')->exists(self::SHOWCASE_EMBEDDED_JPEG)) {
+            $paths[] = self::SHOWCASE_EMBEDDED_JPEG;
+        } else {
+            $this->command?->warn('Embedded showcase JPEG not on disk; attach skipped for that file.');
+        }
+        foreach (self::SHOWCASE_FILES as $f) {
+            $p = 'showcase/'.$f;
+            if (Storage::disk('public')->exists($p)) {
+                $paths[] = $p;
+            }
+        }
+        if ($paths === []) {
+            $this->command?->warn('No showcase image files on disk; nothing to attach.');
+
+            return;
+        }
+
+        $living = Category::query()->where('name', 'Living Room')->first();
+        $products = $living
+            ? Product::query()->where('category_id', $living->id)->get()
+            : Product::query()->get();
+
+        foreach ($products as $product) {
+            $sort = (int) $product->images()->max('sort_order');
+            foreach ($paths as $path) {
+                if ($product->images()->where('path', $path)->exists()) {
+                    continue;
+                }
+                $sort++;
+                $product->images()->create([
+                    'path' => $path,
+                    'sort_order' => $sort,
+                ]);
             }
         }
     }

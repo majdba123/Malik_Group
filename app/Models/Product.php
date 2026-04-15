@@ -14,6 +14,12 @@ class Product extends Model
 
     public const STATUS_PENDING = 'pending';
 
+    /** Maximum image files stored per product. */
+    public const MAX_IMAGES = 24;
+
+    /** Maximum files accepted in one upload field (multi-select / drag-drop). */
+    public const MAX_IMAGES_PER_UPLOAD = 12;
+
     protected $fillable = [
         'category_id',
         'name',

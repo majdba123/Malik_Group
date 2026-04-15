@@ -17,9 +17,17 @@ class ProductImage extends Model
     protected static function booted(): void
     {
         static::deleting(function (ProductImage $image): void {
-            if ($image->path) {
-                Storage::disk('public')->delete($image->path);
+            if (! $image->path) {
+                return;
             }
+            $stillReferenced = static::query()
+                ->where('path', $image->path)
+                ->where('id', '!=', $image->id)
+                ->exists();
+            if ($stillReferenced) {
+                return;
+            }
+            Storage::disk('public')->delete($image->path);
         });
     }
 

@@ -58,11 +58,16 @@ class ProductController extends Controller
             'phone_number' => ['required', 'string', 'max:32'],
             'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'status' => ['required', Rule::in([Product::STATUS_ACTIVE, Product::STATUS_PENDING])],
-            'images' => ['required'],
+            'images' => ['required', 'array', 'max:'.Product::MAX_IMAGES_PER_UPLOAD],
             'images.*' => ['image', 'max:4096'],
         ]);
 
         $imageFiles = $this->validUploadedImages($request);
+        if (count($imageFiles) > Product::MAX_IMAGES) {
+            return back()
+                ->withInput()
+                ->withErrors(['images' => __('You can upload at most :max images per product.', ['max' => Product::MAX_IMAGES])]);
+        }
         if (count($imageFiles) < 1) {
             return back()
                 ->withInput()
@@ -106,7 +111,7 @@ class ProductController extends Controller
             'phone_number' => ['required', 'string', 'max:32'],
             'price' => ['required', 'numeric', 'min:0', 'max:99999999.99'],
             'status' => ['required', Rule::in([Product::STATUS_ACTIVE, Product::STATUS_PENDING])],
-            'images' => ['nullable', 'array'],
+            'images' => ['nullable', 'array', 'max:'.Product::MAX_IMAGES_PER_UPLOAD],
             'images.*' => ['image', 'max:4096'],
             'remove_image_ids' => ['nullable', 'array'],
             'remove_image_ids.*' => ['integer', 'exists:product_images,id'],
@@ -131,6 +136,13 @@ class ProductController extends Controller
         }
 
         $newImages = $this->validUploadedImages($request);
+        $product->refresh();
+        $currentCount = $product->images()->count();
+        if ($newImages !== [] && $currentCount + count($newImages) > Product::MAX_IMAGES) {
+            return back()
+                ->withInput()
+                ->withErrors(['images' => __('This product can have at most :max images. Remove some first or upload fewer files.', ['max' => Product::MAX_IMAGES])]);
+        }
         if ($newImages !== []) {
             $maxSort = (int) $product->images()->max('sort_order');
             foreach ($newImages as $index => $file) {
@@ -142,6 +154,7 @@ class ProductController extends Controller
             }
         }
 
+        $product->refresh();
         if ($product->images()->count() === 0) {
             return back()
                 ->withInput()

@@ -1,9 +1,21 @@
-@php    $img = $product->images->first();
+@php
+    $imgs = $product->images;
+    $first = $imgs->first();
+    $imgCount = $imgs->count();
 @endphp
 <article class="group flex h-full flex-col overflow-hidden rounded-3xl border border-amber-950/10 bg-[#fdfbf7]/95 shadow-[0_20px_50px_-32px_rgba(28,25,23,0.5)] backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-amber-800/20 hover:shadow-[0_28px_60px_-28px_rgba(120,53,15,0.28)]">
     <a href="{{ route('storefront.product', $product) }}" class="relative aspect-[16/11] shrink-0 overflow-hidden bg-stone-200 touch-manipulation min-[480px]:aspect-[4/3]">
-        @if ($img)
-            <img src="{{ asset('storage/'.$img->path) }}" alt="{{ $product->name }}" loading="lazy" class="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]">
+        @if ($imgCount > 1)
+            <div class="product-card-gallery flex h-full w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                @foreach ($imgs as $img)
+                    <img src="{{ asset('storage/'.$img->path) }}" alt="{{ $product->name }}" loading="lazy" class="h-full min-w-full flex-[0_0_100%] snap-center object-cover transition duration-700 ease-out group-hover:scale-[1.04]">
+                @endforeach
+            </div>
+            <span class="pointer-events-none absolute bottom-2 left-2 inline-flex items-center rounded-full bg-stone-950/75 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-50 shadow-md backdrop-blur-sm sm:bottom-3 sm:left-3 sm:px-2.5 sm:text-[11px]" aria-hidden="true">
+                {{ $imgCount }} {{ $imgCount === 1 ? __('photo') : __('photos') }}
+            </span>
+        @elseif ($first)
+            <img src="{{ asset('storage/'.$first->path) }}" alt="{{ $product->name }}" loading="lazy" class="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.04]">
         @else
             <div class="flex h-full min-h-[11rem] flex-col items-center justify-center gap-2 bg-gradient-to-br from-stone-100 to-amber-50 text-stone-400">
                 <x-storefront-icon name="photo" class="h-10 w-10" />

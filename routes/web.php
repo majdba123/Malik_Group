@@ -22,7 +22,7 @@ Route::post('/logout', [LoginController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-Route::middleware(['auth', 'admin'])->group(function (): void {
+Route::middleware(['admin'])->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::resource('dashboard/categories', CategoryController::class)->names('dashboard.categories')->except(['show']);
     Route::resource('dashboard/products', ProductController::class)->names('dashboard.products');

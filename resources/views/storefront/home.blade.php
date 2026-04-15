@@ -18,17 +18,20 @@
             <div class="absolute inset-0 bg-gradient-to-b sm:bg-gradient-to-r from-stone-950/94 via-stone-900/82 to-stone-800/60"></div>
             <div class="absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_70%_20%,rgba(217,119,6,0.12),transparent_55%)]"></div>
         </div>
-        <div class="relative mx-auto flex min-h-[min(68vh,480px)] sm:min-h-[min(72vh,520px)] max-w-7xl flex-col justify-center px-4 py-12 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div class="relative mx-auto flex min-h-[min(68vh,480px)] sm:min-h-[min(72vh,520px)] max-w-7xl flex-col justify-center px-[max(1rem,env(safe-area-inset-left))] py-10 pr-[max(1rem,env(safe-area-inset-right))] sm:px-6 sm:py-20 lg:px-8 lg:py-24">
             <div class="max-w-2xl">
+                <div class="mb-6 drop-shadow-[0_2px_24px_rgba(0,0,0,0.45)] sm:mb-8">
+                    <x-brand-logo variant="light" class="h-10 w-auto sm:h-12 md:h-14" />
+                </div>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-200/90 sm:text-xs">{{ __('Showroom') }}</p>
-                <h1 class="font-display mt-4 text-[1.75rem] font-semibold leading-[1.1] tracking-tight text-white min-[400px]:text-3xl sm:mt-5 sm:text-5xl lg:text-6xl">
+                <h1 class="font-display mt-4 text-[clamp(1.5rem,5.5vw,3.75rem)] font-semibold leading-[1.12] tracking-tight text-white sm:mt-5 lg:text-6xl">
                     {{ __('Pieces that make a room feel finished') }}
                 </h1>
                 <p class="mt-5 max-w-xl text-base leading-relaxed text-stone-200/95 sm:mt-6 sm:text-lg">
                     {{ __('Sofas, dining, bedroom, and office—curated with warm materials, honest pricing, and details you will notice every day.') }}
                 </p>
-                <div class="mt-8 flex w-full max-w-md flex-col gap-3 sm:mt-10 sm:max-w-none sm:flex-row sm:flex-wrap">
-                    <a href="#categories" class="inline-flex min-h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-2xl bg-amber-500 px-6 py-3.5 text-sm font-semibold text-stone-950 shadow-lg shadow-amber-950/25 transition hover:bg-amber-400 sm:w-auto sm:px-7">
+                <div class="mt-8 flex w-full max-w-md flex-col gap-3 sm:mt-10 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-4">
+                    <a href="#categories" class="inline-flex min-h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 py-3.5 text-sm font-semibold text-stone-950 shadow-lg shadow-amber-950/25 transition hover:bg-amber-400 sm:w-auto sm:min-h-0 sm:px-7">
                         <x-storefront-icon name="squares-2x2" class="h-5 w-5 text-stone-900/90" />
                         {{ __('Explore categories') }}
                     </a>

@@ -82,4 +82,8 @@
     .storefront-hero-img {
         object-position: center 65%;
     }
+
+    .product-card-gallery {
+        -webkit-overflow-scrolling: touch;
+    }
 }

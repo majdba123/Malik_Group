@@ -3,8 +3,10 @@
 @section('title', __('Administrator sign in'))
 
 @section('content')
-    <div class="text-center mb-10">
-        <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 text-white text-lg font-bold shadow-lg shadow-violet-500/30 mb-4">MG</div>
+    <div class="mb-10 text-center">
+        <div class="mb-5 inline-block rounded-2xl bg-white px-5 py-3 shadow-xl shadow-black/30 ring-1 ring-white/20">
+            <x-brand-logo variant="dark" class="mx-auto h-10 w-auto max-w-[15rem] sm:h-11" />
+        </div>
         <h1 class="text-2xl font-bold tracking-tight text-white">{{ __('Administrator sign in') }}</h1>
         <p class="mt-2 text-sm text-slate-400">{{ __('Use your admin credentials to access the dashboard.') }}</p>
     </div>

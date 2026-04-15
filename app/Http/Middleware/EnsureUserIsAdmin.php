@@ -12,7 +12,11 @@ class EnsureUserIsAdmin
     {
         $user = $request->user();
 
-        if (! $user || ! $user->is_admin) {
+        if (! $user) {
+            return redirect()->guest(route('login'));
+        }
+
+        if (! $user->is_admin) {
             abort(403, 'This area is restricted to administrators.');
         }
 

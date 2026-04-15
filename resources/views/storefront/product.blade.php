@@ -6,6 +6,7 @@
     @php
         $images = $product->images;
         $main = $images->first();
+        $galleryUrls = $images->map(fn ($i) => asset('storage/'.$i->path))->values()->all();
         $telHref = preg_replace('/[^0-9+]/', '', $product->phone_number);
     @endphp
 
@@ -127,12 +128,20 @@
     </div>
 
     {{-- Lightbox --}}
-    <div id="product-lightbox" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-8" role="dialog" aria-modal="true" aria-labelledby="lightbox-title">
+    <div id="product-lightbox" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-8" role="dialog" aria-modal="true" aria-labelledby="lightbox-title" data-gallery='@json($galleryUrls)'>
         <div id="product-lightbox-backdrop" class="absolute inset-0 bg-stone-950/92 backdrop-blur-md transition-opacity"></div>
         <button type="button" id="product-lightbox-close" class="absolute z-10 flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-white text-stone-900 shadow-xl ring-2 ring-amber-950/15 transition hover:bg-amber-50 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 right-[max(0.75rem,env(safe-area-inset-right))] top-[max(0.75rem,env(safe-area-inset-top))] sm:right-6 sm:top-6 sm:h-12 sm:w-12" aria-label="{{ __('Close image') }}">
             <x-storefront-icon name="x-mark" class="h-6 w-6" />
         </button>
-        <div class="relative z-[1] max-h-[90vh] max-w-[min(100%,1200px)] w-full">
+        @if (count($galleryUrls) > 1)
+            <button type="button" id="product-lightbox-prev" class="absolute z-10 flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-white/95 text-stone-900 shadow-xl ring-2 ring-amber-950/15 transition hover:bg-amber-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 left-[max(0.5rem,env(safe-area-inset-left))] top-1/2 -translate-y-1/2 sm:left-6 sm:h-12 sm:w-12" aria-label="{{ __('Previous image') }}">
+                <x-storefront-icon name="chevron-right" class="h-6 w-6 rotate-180" />
+            </button>
+            <button type="button" id="product-lightbox-next" class="absolute z-10 flex h-12 w-12 touch-manipulation items-center justify-center rounded-full bg-white/95 text-stone-900 shadow-xl ring-2 ring-amber-950/15 transition hover:bg-amber-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 right-[max(0.5rem,env(safe-area-inset-right))] top-1/2 -translate-y-1/2 sm:right-6 sm:h-12 sm:w-12" aria-label="{{ __('Next image') }}">
+                <x-storefront-icon name="chevron-right" class="h-6 w-6" />
+            </button>
+        @endif
+        <div class="relative z-[1] max-h-[90vh] max-w-[min(100%,1200px)] w-full px-12 sm:px-16">
             <p id="lightbox-title" class="sr-only">{{ __('Product image') }}</p>
             <img id="product-lightbox-img" src="" alt="" class="mx-auto max-h-[85vh] w-auto max-w-full rounded-2xl object-contain shadow-2xl ring-1 ring-white/10">
         </div>
@@ -145,16 +154,41 @@
                 var lbImg = document.getElementById('product-lightbox-img');
                 var lbClose = document.getElementById('product-lightbox-close');
                 var lbBackdrop = document.getElementById('product-lightbox-backdrop');
+                var lbPrev = document.getElementById('product-lightbox-prev');
+                var lbNext = document.getElementById('product-lightbox-next');
                 var mainImg = document.getElementById('product-main-image');
                 if (!lb || !lbImg || !lbClose) return;
 
+                var gallery = [];
+                try {
+                    gallery = JSON.parse(lb.getAttribute('data-gallery') || '[]');
+                } catch (e) {
+                    gallery = [];
+                }
+                var lbIndex = 0;
+
+                function syncIndexFromSrc(src) {
+                    var i = gallery.indexOf(src);
+                    lbIndex = i >= 0 ? i : 0;
+                }
+
                 function openLightbox(src, alt) {
-                    lbImg.src = src;
+                    syncIndexFromSrc(src);
+                    if (gallery.length && !gallery[lbIndex]) lbIndex = 0;
+                    var show = gallery.length ? gallery[lbIndex] : src;
+                    lbImg.src = show;
                     lbImg.alt = alt || '';
                     lb.classList.remove('hidden');
                     lb.classList.add('flex');
                     document.body.classList.add('lightbox-open');
                 }
+
+                function lightboxStep(delta) {
+                    if (gallery.length < 2) return;
+                    lbIndex = (lbIndex + delta + gallery.length) % gallery.length;
+                    lbImg.src = gallery[lbIndex];
+                }
+
                 function closeLightbox() {
                     lb.classList.add('hidden');
                     lb.classList.remove('flex');
@@ -189,8 +223,15 @@
 
                 lbClose.addEventListener('click', closeLightbox);
                 if (lbBackdrop) lbBackdrop.addEventListener('click', closeLightbox);
+                if (lbPrev) lbPrev.addEventListener('click', function (e) { e.stopPropagation(); lightboxStep(-1); });
+                if (lbNext) lbNext.addEventListener('click', function (e) { e.stopPropagation(); lightboxStep(1); });
+
                 document.addEventListener('keydown', function (e) {
-                    if (e.key === 'Escape' && !lb.classList.contains('hidden')) closeLightbox();
+                    if (!lb.classList.contains('hidden')) {
+                        if (e.key === 'Escape') closeLightbox();
+                        if (e.key === 'ArrowLeft') lightboxStep(-1);
+                        if (e.key === 'ArrowRight') lightboxStep(1);
+                    }
                 });
             })();
         </script>
