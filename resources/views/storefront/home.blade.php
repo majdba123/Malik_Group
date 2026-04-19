@@ -120,7 +120,7 @@
                 <x-storefront-icon name="shopping-bag" class="h-5 w-5 sm:h-6 sm:w-6" />
             </span>
             <div>
-                <h2 class="font-display text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl lg:text-4xl">{{ __('bY catalog') }}</h2>
+                <h2 class="font-display text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl lg:text-4xl">{{ __('Full catalog') }}</h2>
                 <p class="mt-2 text-sm text-stone-600 sm:mt-3 sm:text-base">{{ __('Filter by category, price, or name—find the right piece for your space.') }}</p>
             </div>
         </div>
