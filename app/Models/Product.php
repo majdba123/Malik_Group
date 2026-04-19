@@ -21,7 +21,7 @@ class Product extends Model
     public const MAX_IMAGES_PER_UPLOAD = 12;
 
     /** Active products per page on home and category storefront grids. */
-    public const STOREFRONT_CATALOG_PER_PAGE = 7;
+    public const STOREFRONT_CATALOG_PER_PAGE = 8;
 
     protected $fillable = [
         'category_id',
