@@ -18,6 +18,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /var/www/Malik_Group
+            git config --global --add safe.directory /var/www/Malik_Group
+            git remote set-url origin https://x-access-token:${DEPLOY_TOKEN}@github.com/majdba123/Malik_Group.git
             git fetch origin
             git reset --hard origin/main
             composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
