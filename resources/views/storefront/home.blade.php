@@ -25,7 +25,7 @@
                 </div>
                 <p class="text-[11px] font-semibold uppercase tracking-[0.28em] text-amber-200/90 sm:text-xs">{{ __('Showroom') }}</p>
                 <h1 class="font-display mt-4 text-[clamp(1.5rem,5.5vw,3.75rem)] font-semibold leading-[1.12] tracking-tight text-white sm:mt-5 lg:text-6xl">
-                    {{ __('Pieces that make a room feel finished') }}
+                    {{ __('bayer that make a room feel finished') }}
                 </h1>
                 <p class="mt-5 max-w-xl text-base leading-relaxed text-stone-200/95 sm:mt-6 sm:text-lg">
                     {{ __('Sofas, dining, bedroom, and office—curated with warm materials, honest pricing, and details you will notice every day.') }}
