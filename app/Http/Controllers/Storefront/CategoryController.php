@@ -17,7 +17,7 @@ class CategoryController extends Controller
             ->with(['category', 'images'])
             ->filterCatalog($request, $category->id)
             ->latest()
-            ->paginate(12)
+            ->paginate(Product::STOREFRONT_CATALOG_PER_PAGE)
             ->withQueryString();
 
         return view('storefront.category', compact('category', 'products'));

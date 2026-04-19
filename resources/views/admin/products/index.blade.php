@@ -46,8 +46,8 @@
     </div>
 
     <div class="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200">
+        <div class="admin-table-scroll -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            <table class="min-w-[640px] w-full divide-y divide-slate-200 sm:min-w-full">
                 <thead class="bg-slate-50/80">
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">{{ __('Preview') }}</th>
@@ -116,7 +116,7 @@
         </div>
         @if ($products->hasPages())
             <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
-                {{ $products->links() }}
+                {{ $products->links('pagination.admin') }}
             </div>
         @endif
     </div>

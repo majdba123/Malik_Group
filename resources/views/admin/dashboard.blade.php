@@ -30,6 +30,7 @@
             <div class="mt-4 flex flex-wrap gap-2">
                 <a href="{{ route('dashboard.categories.create') }}" class="inline-flex items-center rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800">{{ __('New category') }}</a>
                 <a href="{{ route('dashboard.products.create') }}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">{{ __('New product') }}</a>
+                <a href="{{ route('dashboard.site-footer.edit') }}" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">{{ __('Site footer') }}</a>
             </div>
         </div>
     </div>

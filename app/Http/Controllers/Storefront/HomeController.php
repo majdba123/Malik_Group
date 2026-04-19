@@ -29,7 +29,7 @@ class HomeController extends Controller
             ->with(['category', 'images'])
             ->filterCatalog($request)
             ->latest()
-            ->paginate(12)
+            ->paginate(Product::STOREFRONT_CATALOG_PER_PAGE)
             ->withQueryString();
 
         return view('storefront.home', compact('categories', 'featured', 'products'));

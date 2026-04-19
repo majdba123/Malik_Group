@@ -12,7 +12,7 @@
 
     <article class="relative overflow-hidden border-b border-amber-950/10 bg-[#fdfbf7]/90 backdrop-blur-sm">
         <div class="pointer-events-none absolute inset-0 h-44 bg-gradient-to-b from-amber-100/50 via-transparent to-transparent sm:h-52"></div>
-        <div class="relative mx-auto max-w-7xl px-4 py-5 sm:scroll-mt-28 sm:px-6 sm:py-6 lg:px-8 lg:py-8 scroll-mt-24">
+        <div class="relative mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left))] py-5 pr-[max(1rem,env(safe-area-inset-right))] sm:scroll-mt-28 sm:px-6 sm:py-6 lg:px-8 lg:py-8 scroll-mt-24">
             <nav class="flex flex-wrap items-center gap-x-1 gap-y-2 text-sm" aria-label="Breadcrumb">
                 <a href="{{ route('home') }}" aria-label="{{ __('Home') }}" class="inline-flex min-h-11 touch-manipulation items-center gap-1.5 rounded-full bg-white/90 px-3 py-2 font-semibold text-stone-600 shadow-sm ring-1 ring-amber-950/10 transition hover:bg-amber-50 hover:text-amber-950 sm:min-h-0 sm:py-1">
                     <x-storefront-icon name="home" class="h-4 w-4 shrink-0" />
@@ -34,7 +34,7 @@
         </div>
     </article>
 
-    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-14">
+    <div class="mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left))] py-6 pr-[max(1rem,env(safe-area-inset-right))] sm:px-6 sm:py-8 lg:px-8 lg:py-14">
         <div class="grid gap-8 items-start sm:gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-16">
             {{-- Gallery --}}
             <div class="lg:col-span-7 space-y-4 sm:space-y-5 lg:sticky lg:top-[4.75rem]">

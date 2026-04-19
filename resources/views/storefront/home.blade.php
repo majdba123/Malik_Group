@@ -45,7 +45,7 @@
     </section>
 
     {{-- Categories --}}
-    <section id="categories" class="relative mx-auto max-w-7xl px-4 py-12 sm:scroll-mt-28 sm:py-16 sm:px-6 lg:px-8 scroll-mt-24">
+    <section id="categories" class="relative mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left))] py-12 pr-[max(1rem,env(safe-area-inset-right))] sm:scroll-mt-28 sm:py-16 sm:px-6 lg:px-8 scroll-mt-24">
         <div class="mb-8 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
             <div class="flex gap-3 sm:gap-4">
                 <span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-900 ring-1 ring-amber-950/10 sm:h-12 sm:w-12" aria-hidden="true">
@@ -91,7 +91,7 @@
 
     {{-- Latest 5 --}}
     <section id="featured" class="relative border-y border-amber-950/10 storefront-parquet scroll-mt-24 sm:scroll-mt-28">
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left))] py-12 pr-[max(1rem,env(safe-area-inset-right))] sm:py-16 sm:px-6 lg:px-8">
             <div class="mb-8 flex gap-3 sm:mb-12 sm:gap-4">
                 <span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-amber-900 shadow-sm ring-1 ring-amber-950/10 sm:h-12 sm:w-12" aria-hidden="true">
                     <x-storefront-icon name="sparkles" class="h-5 w-5 sm:h-6 sm:w-6" />
@@ -114,7 +114,7 @@
     </section>
 
     {{-- Catalog + filters --}}
-    <section id="catalog" class="mx-auto max-w-7xl px-4 py-12 sm:scroll-mt-28 sm:py-16 sm:px-6 lg:px-8 scroll-mt-24">
+    <section id="catalog" class="mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left))] py-12 pr-[max(1rem,env(safe-area-inset-right))] sm:scroll-mt-28 sm:py-16 sm:px-6 lg:px-8 scroll-mt-24">
         <div class="mb-8 flex gap-3 sm:mb-10 sm:gap-4">
             <span class="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-900 ring-1 ring-amber-950/10 sm:h-12 sm:w-12" aria-hidden="true">
                 <x-storefront-icon name="shopping-bag" class="h-5 w-5 sm:h-6 sm:w-6" />
@@ -135,20 +135,25 @@
         @if ($products->isEmpty())
             <p class="storefront-parquet rounded-3xl border border-amber-950/15 px-6 py-12 text-center text-stone-600 sm:px-8 sm:py-16">{{ __('No products match your filters. Try adjusting search or price.') }}</p>
         @else
-            <div class="grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-                @foreach ($products as $product)
-                    @include('storefront.partials.product-card', ['product' => $product])
-                @endforeach
-            </div>
-            <div class="mt-10 sm:mt-12">
-                {{ $products->links() }}
+            <div id="catalog-results" class="scroll-mt-28 sm:scroll-mt-32">
+                <div class="grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+                    @foreach ($products as $product)
+                        @include('storefront.partials.product-card', ['product' => $product])
+                    @endforeach
+                </div>
+                <div class="mt-10 border-t border-amber-950/10 pt-8 sm:mt-12 sm:pt-10">
+                    {{ $products->links('pagination.storefront') }}
+                </div>
             </div>
         @endif
     </section>
 
-    @if (request()->hasAny(['category_id', 'q', 'min_price', 'max_price']))
+    @if (request()->hasAny(['category_id', 'q', 'min_price', 'max_price']) || (request()->filled('page') && (int) request('page') > 1))
         <script>
-            document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            (function () {
+                var el = document.getElementById('catalog-results') || document.getElementById('catalog');
+                el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            })();
         </script>
     @endif
 @endsection

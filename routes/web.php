@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\SiteFooterSettingController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Storefront\CategoryController as StorefrontCategoryController;
 use App\Http\Controllers\Storefront\HomeController;
@@ -26,4 +27,6 @@ Route::middleware(['admin'])->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::resource('dashboard/categories', CategoryController::class)->names('dashboard.categories')->except(['show']);
     Route::resource('dashboard/products', ProductController::class)->names('dashboard.products');
+    Route::get('/dashboard/site-footer', [SiteFooterSettingController::class, 'edit'])->name('dashboard.site-footer.edit');
+    Route::put('/dashboard/site-footer', [SiteFooterSettingController::class, 'update'])->name('dashboard.site-footer.update');
 });

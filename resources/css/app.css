@@ -86,4 +86,9 @@
     .product-card-gallery {
         -webkit-overflow-scrolling: touch;
     }
+
+    .admin-table-scroll {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
 }

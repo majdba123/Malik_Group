@@ -12,7 +12,7 @@
             @endif
             <div class="absolute inset-0 bg-gradient-to-b sm:bg-gradient-to-r from-stone-950/95 via-stone-950/82 to-stone-900/50"></div>
         </div>
-        <div class="relative mx-auto max-w-7xl px-4 py-10 sm:scroll-mt-28 sm:px-6 sm:py-14 lg:px-8 scroll-mt-24">
+        <div class="relative mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left))] py-10 pr-[max(1rem,env(safe-area-inset-right))] sm:scroll-mt-28 sm:px-6 sm:py-14 lg:px-8 scroll-mt-24">
             <nav class="mb-6 text-sm font-medium text-stone-300" aria-label="Breadcrumb">
                 <ol class="flex flex-wrap items-center gap-x-1 gap-y-2">
                     <li class="inline-flex items-center">
@@ -38,7 +38,7 @@
             <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
                 <div class="max-w-2xl min-w-0">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.25em] text-amber-200/90 sm:text-xs">{{ __('Collection') }}</p>
-                    <h1 class="font-display mt-2 text-2xl font-semibold tracking-tight sm:mt-3 sm:text-4xl lg:text-5xl">{{ $category->name }}</h1>
+                    <h1 class="font-display mt-2 text-[clamp(1.375rem,4.5vw,3.25rem)] font-semibold leading-tight tracking-tight sm:mt-3 sm:text-4xl lg:text-5xl">{{ $category->name }}</h1>
                     @if ($category->description)
                         <p class="mt-4 text-base leading-relaxed text-stone-200/95 sm:mt-5 sm:text-lg">{{ $category->description }}</p>
                     @endif
@@ -51,7 +51,7 @@
         </div>
     </div>
 
-    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+    <div class="mx-auto max-w-7xl px-[max(1rem,env(safe-area-inset-left))] py-10 pr-[max(1rem,env(safe-area-inset-right))] sm:px-6 sm:py-12 lg:px-8">
         <div class="mb-8 sm:mb-10">
             @include('storefront.partials.catalog-filters', [
                 'formAction' => route('storefront.category', $category),
@@ -64,20 +64,25 @@
         @if ($products->isEmpty())
             <p class="storefront-parquet rounded-3xl border border-amber-950/15 px-6 py-12 text-center text-stone-600 sm:px-8 sm:py-16">{{ __('No products in this category match your filters.') }}</p>
         @else
-            <div class="grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-                @foreach ($products as $product)
-                    @include('storefront.partials.product-card', ['product' => $product])
-                @endforeach
-            </div>
-            <div class="mt-10 sm:mt-12">
-                {{ $products->links() }}
+            <div id="category-catalog-results" class="scroll-mt-28 sm:scroll-mt-32">
+                <div class="grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+                    @foreach ($products as $product)
+                        @include('storefront.partials.product-card', ['product' => $product])
+                    @endforeach
+                </div>
+                <div class="mt-10 border-t border-amber-950/10 pt-8 sm:mt-12 sm:pt-10">
+                    {{ $products->links('pagination.storefront') }}
+                </div>
             </div>
         @endif
     </div>
 
-    @if (request()->hasAny(['q', 'min_price', 'max_price']))
+    @if (request()->hasAny(['q', 'min_price', 'max_price']) || (request()->filled('page') && (int) request('page') > 1))
         <script>
-            window.scrollTo({ top: document.querySelector('.mb-8')?.offsetTop ?? 0, behavior: 'smooth' });
+            (function () {
+                var el = document.getElementById('category-catalog-results') || document.querySelector('.mb-8');
+                el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            })();
         </script>
     @endif
 @endsection

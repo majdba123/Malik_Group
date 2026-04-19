@@ -46,25 +46,11 @@
         </div>
     </header>
 
-    <main id="main">
+    <main id="main" class="pb-[max(0.5rem,env(safe-area-inset-bottom))] outline-none">
         @yield('content')
     </main>
 
-    <footer class="relative mt-20 border-t border-amber-950/15 bg-gradient-to-b from-stone-900 via-stone-900 to-stone-950 text-stone-300">
-        <div class="pointer-events-none absolute inset-0 opacity-[0.07] bg-[url('data:image/svg+xml,%3Csvg width=%2760%27 height=%2760%27 xmlns=%27http://www.w3.org/2000/svg%27%3E%3Cpath d=%27M30 0L60 30 30 60 0 30z%27 fill=%27none%27 stroke=%27%23fff%27 stroke-width=%271%27/%3E%3C/svg%3E')] bg-[length:60px_60px]"></div>
-        <div class="relative mx-auto max-w-7xl px-4 py-10 sm:py-12 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-sm">
-            <div class="flex flex-col items-center gap-4 text-center sm:items-start sm:text-left">
-                <div class="rounded-xl bg-white/95 px-4 py-2.5 shadow-lg shadow-black/25 ring-1 ring-white/10">
-                    <x-brand-logo variant="dark" class="h-9 w-auto sm:h-10" />
-                </div>
-                <p class="text-stone-500">&copy; {{ date('Y') }}. {{ __('All rights reserved.') }}</p>
-            </div>
-            <a href="{{ route('home') }}#catalog" class="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-600/15 px-4 py-3 min-h-11 font-semibold text-amber-200 ring-1 ring-amber-500/30 transition hover:bg-amber-500/20 touch-manipulation w-full sm:w-auto">
-                <x-storefront-icon name="shopping-bag" class="h-5 w-5 text-amber-300/90" />
-                {{ __('Browse catalog') }}
-            </a>
-        </div>
-    </footer>
+    @include('storefront.partials.site-footer', ['footerSetting' => $footerSetting ?? null])
     @stack('scripts')
 </body>
 </html>

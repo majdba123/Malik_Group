@@ -20,6 +20,9 @@ class Product extends Model
     /** Maximum files accepted in one upload field (multi-select / drag-drop). */
     public const MAX_IMAGES_PER_UPLOAD = 12;
 
+    /** Active products per page on home and category storefront grids. */
+    public const STOREFRONT_CATALOG_PER_PAGE = 7;
+
     protected $fillable = [
         'category_id',
         'name',

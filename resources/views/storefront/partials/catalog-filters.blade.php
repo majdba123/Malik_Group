@@ -14,7 +14,7 @@
     $searchColClass = ($categories && ! $lockedCategory) ? 'lg:col-span-3' : 'lg:col-span-4';
 @endphp
 
-<form method="GET" action="{{ $formAction }}" class="rounded-3xl border border-amber-950/12 bg-[#fdfbf7]/95 p-4 shadow-[0_20px_50px_-36px_rgba(28,25,23,0.45)] backdrop-blur-sm sm:p-7">
+<form method="GET" action="{{ $formAction }}" class="rounded-3xl border border-amber-950/12 bg-[#fdfbf7]/95 p-4 shadow-[0_20px_50px_-36px_rgba(28,25,23,0.45)] backdrop-blur-sm sm:p-7 max-w-[100vw] sm:max-w-none">
     <div class="mb-4 flex flex-col gap-3 sm:mb-5 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-2.5">
             <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-900 sm:h-10 sm:w-10" aria-hidden="true">
