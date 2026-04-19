@@ -2,6 +2,7 @@
     /** @var \App\Models\SiteFooterSetting|null $footerSetting */
     $footerSetting = $footerSetting ?? null;
     $wa = $footerSetting?->whatsappHref();
+    $phoneWa = $footerSetting?->phoneLineWhatsAppHref();
     $ig = $footerSetting?->instagramHref();
     $tt = $footerSetting?->tiktokHref();
     $fb = $footerSetting?->facebookHref();
@@ -35,9 +36,13 @@
                             </li>
                         @endif
                         @if (filled($footerSetting->contact_phone))
-                            @php $tel = preg_replace('/[^0-9+]/', '', $footerSetting->contact_phone); @endphp
                             <li>
-                                <a href="tel:{{ $tel }}" class="font-mono font-medium text-amber-200/95 underline-offset-2 hover:text-amber-100 hover:underline touch-manipulation">{{ $footerSetting->contact_phone }}</a>
+                                @if ($phoneWa)
+                                    <a href="{{ $phoneWa }}" target="_blank" rel="noopener noreferrer" class="font-mono font-medium text-amber-200/95 underline-offset-2 hover:text-amber-100 hover:underline touch-manipulation">{{ $footerSetting->contact_phone }}</a>
+                                @else
+                                    @php $tel = preg_replace('/[^0-9+]/', '', $footerSetting->contact_phone); @endphp
+                                    <a href="tel:{{ $tel }}" class="font-mono font-medium text-amber-200/95 underline-offset-2 hover:text-amber-100 hover:underline touch-manipulation">{{ $footerSetting->contact_phone }}</a>
+                                @endif
                             </li>
                         @endif
                     </ul>

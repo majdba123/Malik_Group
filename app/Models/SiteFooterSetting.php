@@ -54,6 +54,24 @@ class SiteFooterSetting extends Model
         return $digits !== '' ? 'https://wa.me/'.$digits : null;
     }
 
+    /**
+     * WhatsApp URL for the footer phone line: uses the WhatsApp field if set, otherwise digits from contact_phone.
+     */
+    public function phoneLineWhatsAppHref(): ?string
+    {
+        $fromWhatsapp = $this->whatsappHref();
+        if ($fromWhatsapp !== null) {
+            return $fromWhatsapp;
+        }
+        $raw = trim((string) $this->contact_phone);
+        if ($raw === '') {
+            return null;
+        }
+        $digits = preg_replace('/\D+/', '', $raw);
+
+        return $digits !== '' ? 'https://wa.me/'.$digits : null;
+    }
+
     public function instagramHref(): ?string
     {
         return $this->socialHref($this->instagram, 'https://instagram.com/');

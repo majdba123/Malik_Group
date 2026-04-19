@@ -7,7 +7,8 @@
         $images = $product->images;
         $main = $images->first();
         $galleryUrls = $images->map(fn ($i) => asset('storage/'.$i->path))->values()->all();
-        $telHref = preg_replace('/[^0-9+]/', '', $product->phone_number);
+        $waDigits = preg_replace('/\D+/', '', $product->phone_number);
+        $whatsappHref = $waDigits !== '' ? 'https://wa.me/'.$waDigits : null;
     @endphp
 
     <article class="relative overflow-hidden border-b border-amber-950/10 bg-[#fdfbf7]/90 backdrop-blur-sm">
@@ -102,13 +103,14 @@
                 <div class="space-y-3">
                     <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500">{{ __('Actions') }}</p>
                     <div class="grid gap-3 sm:grid-cols-1">
-                        <a href="tel:{{ $telHref }}"
-                            class="group flex min-h-[3.5rem] touch-manipulation items-center gap-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-4 text-white shadow-lg shadow-emerald-600/25 transition hover:from-emerald-500 hover:to-teal-500 hover:shadow-xl sm:px-5">
+                        <a href="{{ $whatsappHref ?? '#' }}"
+                            @if ($whatsappHref) target="_blank" rel="noopener noreferrer" @endif
+                            class="group flex min-h-[3.5rem] touch-manipulation items-center gap-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-4 text-white shadow-lg shadow-emerald-600/25 transition hover:from-emerald-500 hover:to-teal-500 hover:shadow-xl sm:px-5 {{ $whatsappHref ? '' : 'pointer-events-none opacity-60' }}">
                             <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/20 ring-2 ring-white/30 transition group-hover:scale-105 sm:h-12 sm:w-12">
                                 <x-storefront-icon name="phone" class="h-6 w-6" />
                             </span>
                             <span class="min-w-0 flex-1 text-left">
-                                <span class="block text-xs font-semibold uppercase tracking-wide text-emerald-100/90">{{ __('Call now') }}</span>
+                                <span class="block text-xs font-semibold uppercase tracking-wide text-emerald-100/90">{{ __('WhatsApp') }}</span>
                                 <span class="block truncate text-lg font-bold font-mono tracking-wide">{{ $product->phone_number }}</span>
                             </span>
                             <x-storefront-icon name="chevron-right" class="h-5 w-5 shrink-0 text-white/80" />
