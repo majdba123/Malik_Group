@@ -1,3 +1,5 @@
+# CI/CD Pipeline for Malik Group
+
 name: Deploy to Production
 
 on:
@@ -7,8 +9,13 @@ on:
 
 jobs:
   deploy:
+    name: Deploy to Server
     runs-on: ubuntu-latest
+
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Deploy to Server via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -18,15 +25,42 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /var/www/Malik_Group
+
+            # Fix git ownership issue
             git config --global --add safe.directory /var/www/Malik_Group
-            git remote set-url origin https://x-access-token:${DEPLOY_TOKEN}@github.com/majdba123/Malik_Group.git
+
+            # Force update to match GitHub
             git fetch origin
             git reset --hard origin/main
-            composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
-            npm ci && npm run build
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan migrate --force
-            php artisan optimize
-            echo "Deployed successfully!"
+
+            # Install Composer dependencies
+            /usr/bin/php8.4 /usr/local/bin/composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+            # Install NPM dependencies and build Vite assets
+            npm ci
+            npm run build
+
+            # Run Laravel optimizations
+            /usr/bin/php8.4 artisan config:clear
+            /usr/bin/php8.4 artisan route:cache
+            /usr/bin/php8.4 artisan view:cache
+
+            # Run migrations
+            /usr/bin/php8.4 artisan migrate --force
+
+            # Ensure storage link
+            /usr/bin/php8.4 artisan storage:link || true
+
+            # Clear application cache
+            /usr/bin/php8.4 artisan cache:clear
+
+            # Fix permissions
+            chown -R www-data:www-data .
+            chmod -R 775 storage
+            chmod -R 775 bootstrap/cache
+
+            # Restart services
+            systemctl reload php8.4-fpm
+            systemctl reload nginx
+
+            echo "Deployment completed successfully!"
