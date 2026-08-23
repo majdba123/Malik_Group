@@ -1,58 +1,233 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Malik Group Furniture Catalog
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[English](README.md) | [العربية](README_AR.md)
 
-## About Laravel
+> A Laravel-powered furniture catalog and administration platform for presenting categorized products, rich product galleries, pricing, search and filtering, and direct customer contact.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Malik Group is a furniture and interiors web platform built around two clear surfaces:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- a public **storefront/catalog** where visitors can discover categories and furniture products;
+- an authenticated **administration dashboard** for managing products, categories, imagery, publication state, and site footer content.
 
-## Learning Laravel
+The project is implemented as a server-rendered Laravel application with Blade templates and a Vite/Tailwind frontend asset pipeline. Product discovery and management are handled inside the same application, keeping the public catalog and operational administration connected through a single data model.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Core Capabilities
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Public Storefront
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+The public side of the application includes:
 
-## Agentic Development
+- home-page product catalog;
+- furniture categories;
+- featured / recently added products;
+- category-specific browsing;
+- product search;
+- minimum and maximum price filtering;
+- paginated product listings;
+- dedicated product detail pages;
+- multi-image product galleries;
+- full-screen product image viewing;
+- displayed pricing and currency;
+- direct WhatsApp contact using the product contact number;
+- responsive storefront navigation and layouts.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Only products in the active state are exposed through the public catalog queries.
 
-```bash
-composer require laravel/boost --dev
+### Administration
 
-php artisan boost:install
+The protected administration area includes dedicated management flows for:
+
+- dashboard access;
+- product management;
+- product image management;
+- category management;
+- product publication status;
+- product pricing and contact details;
+- site footer settings;
+- authenticated admin access.
+
+Administrative routes are protected by the application's `admin` middleware.
+
+## Product Model
+
+The current catalog model is intentionally focused and practical. A product can include:
+
+- category;
+- name;
+- description;
+- contact phone number;
+- price;
+- publication status;
+- multiple ordered images.
+
+The application currently distinguishes active and pending product states, and the storefront only queries active products.
+
+## Architecture
+
+```text
+┌───────────────────────────────┐
+│       Public Storefront       │
+│     Laravel Blade Views       │
+│ Catalog • Search • Products   │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│      Laravel Application      │
+│ Controllers • Validation     │
+│ Authentication • Middleware  │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│     Eloquent / Database       │
+│ Categories • Products •      │
+│ Product Images • Settings    │
+└───────────────▲───────────────┘
+                │
+┌───────────────┴───────────────┐
+│      Admin Dashboard          │
+│ Products • Categories •      │
+│ Site Footer Management       │
+└───────────────────────────────┘
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Technology Stack
 
-## Contributing
+| Area | Technology |
+| --- | --- |
+| Backend | PHP 8.3+, Laravel 13 |
+| Rendering | Laravel Blade |
+| ORM | Laravel Eloquent |
+| Frontend tooling | Vite 8 |
+| Styling | Tailwind CSS 4 |
+| HTTP client / frontend utility | Axios |
+| Testing | PHPUnit 12 |
+| Build / local process tooling | npm, Composer, Concurrently |
+| Production deployment | GitHub Actions + SSH |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Repository Structure
 
-## Code of Conduct
+```text
+.
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Admin/              # Protected management flows
+│   │   ├── Auth/               # Authentication
+│   │   └── Storefront/         # Public catalog controllers
+│   └── Models/                 # Product, category, image, user, settings models
+├── database/
+│   ├── migrations/             # Application schema
+│   └── seeders/                # Demo/catalog seed data
+├── resources/
+│   ├── css/                    # Frontend styles
+│   ├── js/                     # Frontend scripts
+│   └── views/
+│       ├── admin/              # Admin interface
+│       ├── auth/               # Login/auth views
+│       ├── components/         # Shared Blade components
+│       ├── layouts/            # Page layouts
+│       └── storefront/         # Public catalog pages
+├── routes/
+│   └── web.php                 # Storefront, authentication and admin routes
+├── public/                     # Public assets and Laravel entry point
+├── tests/                      # Automated tests
+├── .github/workflows/          # Production deployment workflow
+├── composer.json
+└── package.json
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Main Web Routes
 
-## Security Vulnerabilities
+The application exposes a focused browser-based flow:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```text
+/                         Public storefront
+/categories/{category}    Category catalog
+/products/{product}       Product details
+/login                    Administrator login
+/dashboard                Administrator dashboard
+/dashboard/categories     Category management
+/dashboard/products       Product management
+/dashboard/site-footer    Footer content settings
+```
 
-## License
+## Catalog Filtering
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The storefront product query supports filtering by:
+
+- category;
+- product name search;
+- minimum price;
+- maximum price.
+
+Filters are applied at the query level and retained across pagination.
+
+## Product Images
+
+Products can contain multiple ordered images. The current model defines limits for total product images and per-upload batches, while public product pages render a main image, thumbnails, and a full-screen gallery experience.
+
+The application uses Laravel's public storage disk for managed product media.
+
+## Demo Catalog Data
+
+The repository includes a furniture catalog seeder with representative data for categories such as:
+
+- Living Room
+- Bedroom
+- Dining
+- Home Office
+- Storage & Shelving
+
+This seed data is intended to populate a useful development/showcase catalog and should not be interpreted as the production inventory state.
+
+## Development
+
+The repository defines a Composer setup workflow that installs backend and frontend dependencies, prepares the environment, runs migrations, and builds frontend assets.
+
+Typical local commands are:
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm install
+npm run build
+```
+
+For concurrent local development services, the project also defines:
+
+```bash
+composer dev
+```
+
+Environment-specific database, mail, application URL, and other secrets must be configured outside source control.
+
+## Testing
+
+Backend tests can be executed through the Composer test script:
+
+```bash
+composer test
+```
+
+The presence of test configuration does not by itself mean the current branch has been runtime-verified in every environment. Build, migration, and test results should be evaluated independently from this repository documentation.
+
+## Deployment
+
+The repository contains a GitHub Actions production deployment workflow that runs on pushes to `main` and deploys to the configured server over SSH using repository secrets.
+
+The production workflow installs Composer dependencies, installs and builds frontend dependencies, runs Laravel cache optimizations and migrations, ensures the storage link, updates permissions, and reloads the configured PHP-FPM and Nginx services.
+
+No deployment credentials are stored in this README; infrastructure secrets belong in GitHub repository secrets and the server environment.
+
+## Project Scope
+
+This repository should be described as a **furniture catalog and administration platform**, not as a complete transactional e-commerce system. The verified application provides catalog browsing, product management, filtering, imagery, pricing, and direct customer contact, while a cart, payment checkout, and order-management workflow are not part of the currently verified repository scope.
+
+---
+
+Built as a focused business storefront with a manageable catalog backend and a production deployment workflow.
